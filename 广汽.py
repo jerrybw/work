@@ -112,7 +112,7 @@ def create_agent(url_host, cno, name, area_code, hot_line, skill_ids, enterprise
 
 def create_gateway(url_host,name,password, enterprise_id, token):
     create_gateway_url = url_host + "/interface/v10/iad/create"
-    result_str = "11"
+    result_str = "调接口失败"
     params = {
         'validateType': 2,
         "enterpriseId": enterprise_id,
@@ -127,10 +127,10 @@ def create_gateway(url_host,name,password, enterprise_id, token):
     sign_md5 = get_sign(enterprise_id, token, timestamp)
     params["timestamp"] = timestamp
     params["sign"] = sign_md5
-    r = requests.post(create_gateway_url, params)
-    result_str = str(r.json())
-    result_str = str(params)+"--------"+result_str
     try:
+        r = requests.post(create_gateway_url, params)
+        result_str = str(r.json())
+        result_str = str(params)+"--------"+result_str
         if str(r.json()["result"]) == "0":
             return True, result_str
     except Exception:
@@ -140,7 +140,7 @@ def create_gateway(url_host,name,password, enterprise_id, token):
 
 def create_extension(url_host,exten,password,area_code,iad_name, enterprise_id, token):
     create_extension_url = url_host + "/interface/v10/exten/create"
-    result_str = "11"
+    result_str = "调接口失败"
     params = {
         'validateType': 2,
         "enterpriseId": enterprise_id,
@@ -155,10 +155,10 @@ def create_extension(url_host,exten,password,area_code,iad_name, enterprise_id, 
     sign_md5 = get_sign(enterprise_id, token, timestamp)
     params["timestamp"] = timestamp
     params["sign"] = sign_md5
-    r = requests.post(create_extension_url, params)
-    result_str = str(r.json())
-    result_str = str(params) + "--------" + result_str
     try:
+        r = requests.post(create_extension_url, params)
+        result_str = str(r.json())
+        result_str = str(params) + "--------" + result_str
         if str(r.json()["result"]) == "0":
             return True, result_str
     except Exception:
@@ -280,7 +280,7 @@ def create_router(url_host, enterprise_id, token):
 def import_push(url_host, enterprise_id, token):
     path_list = ["1.txt","2.txt","3.txt","4.txt",]
     result_str = ""
-    tmp = ""
+    tmp = "调接口失败"
     for path_str in path_list:
         files = {"file": open("D:\gq/"+path_str, "rb")}
         params = {
@@ -293,9 +293,10 @@ def import_push(url_host, enterprise_id, token):
         params["sign"] = sign_md5
         param_str = urllib.parse.urlencode(params)  # urlencode参数
         import_push_url = url_host + "/interface/v10/enterprisePushAction/importPush?" + param_str
-        r = requests.post(import_push_url, files=files)
-        result_str = result_str + str(params) + "--------" + result_str+";"
+        tmp = ""
         try:
+            r = requests.post(import_push_url, files=files)
+            result_str = result_str + str(params) + "--------" + result_str+";"
             if str(r.json()["result"]) != "0":
                 tmp = tmp+path_str+"导入失败;"
             else:
@@ -312,6 +313,7 @@ if __name__ == "__main__":
     log_path = "D:\gq/log/" + today_str + "/"  # 定义日志存放地址，默认为当前文件同目录下log文件夹下
     tmp_path = "D:\gq/tmp/" + today_str + "/"  # 定义临时字典存放地址，默认为当前文件同目录下tmp文件夹下
     ivr_path = "D:\gq/ivr/" + today_str + "/"  # 定义临时ivr存放地址，默认为当前文件同目录下ivr文件夹下
+    yongyou_path = "D:\gq/yongyou/" + today_str + "/"  # 定义临时ivr存放地址，默认为当前文件同目录下ivr文件夹下
     # url_host = "https://interface-gqcq.gacmotor.com/"
     url_host = "https://api-test-2.cticloud.cn/"
     if not os.path.exists(log_path):  # 判断日志地址是否存在，若不存在则创建
@@ -320,6 +322,8 @@ if __name__ == "__main__":
         os.makedirs(tmp_path)
     if not os.path.exists(ivr_path):  # 判断ivr地址是否存在，若不存在则创建
         os.makedirs(ivr_path)
+    if not os.path.exists(yongyou_path):  # 判断ivr地址是否存在，若不存在则创建
+        os.makedirs(yongyou_path)
     skill_tmp_resource = ""
     queue_tmp_resource = ""
     transfer_tmp_resource = ""
@@ -332,7 +336,7 @@ if __name__ == "__main__":
         queue_dict = json.load(open(tmp_path + "queue.json", encoding='utf-8'))
         transfer_dict = json.load(open(tmp_path + "transfer.json", encoding='utf-8'))
         gateway_dict = json.load(open(tmp_path + "gateway.json", encoding='utf-8'))
-        # mendian_dict = json.load(open("D:\gq/mendian.json", encoding='utf-8'))
+        mendian_dict = json.load(open("D:\gq/mendian.json", encoding='utf-8'))
     except Exception:
         print(Exception.__context__)
     result_log_source = codecs.open(log_path + "result.log", 'a+', 'utf-8')
@@ -346,6 +350,7 @@ if __name__ == "__main__":
     ivr_log_source = codecs.open(log_path + "ivr.log", 'a+', 'utf-8')
     push_log_source = codecs.open(log_path + "push.log", 'a+', 'utf-8')
     router_log_source = codecs.open(log_path + "router.log", 'a+', 'utf-8')
+    yongyou_data_source = codecs.open(yongyou_path + today_str+".csv", 'w+', 'utf-8-sig')
     try:
         for data in data_resource:
             data_list = data.replace("\r", "").replace("\n", "").split(",")
@@ -386,6 +391,13 @@ if __name__ == "__main__":
             except Exception:
                 gateway_dict[enterprise_id] = {}
             skill_id = 0
+            transfer_dict[enterprise_id]["code"] = unique_num
+            try:
+                transfer_map = transfer_dict[enterprise_id]["persons"]
+            except Exception:
+                transfer_dict[enterprise_id]["persons"] = {}
+            transfer_dict[enterprise_id]["persons"][cno] = str(cno) + "," + str(personnel_id) + ",," + str(
+                cno) + ",," + str(personnel_id) + "," + str(name) + "," + str(skill_name) + "," + str(unique_num) + "\n"
             try:
                 skill_id = skill_dict[enterprise_id][skill_name]
                 result_log_source.write(";获取技能成功")
@@ -478,8 +490,15 @@ if __name__ == "__main__":
         queue_log_source.close()
         skill_log_source.close()
         data_resource.close()
+    yongyou_data_str = ""
     try:
         for enterprise_key in transfer_dict:
+            yongyou_data_str = yongyou_data_str + str(mendian_dict[transfer_dict[enterprise_key]["code"]]) + ",坐席号,CTI员工号,密码（明文：gqcq@2020）,绑定分机号,是否有效,传祺登录账号,员工姓名,岗位,经销商代码,经销商名称\n"
+            yongyou_data_count = 1
+            for yongyou_data_cno_str in transfer_dict[enterprise_key]["persons"]:
+                yongyou_data_str = yongyou_data_str + str(yongyou_data_count) +","+ str(transfer_dict[enterprise_key]["persons"][yongyou_data_cno_str])
+                yongyou_data_count += 1
+            yongyou_data_str = yongyou_data_str + "\n"
             ivr_resource = codecs.open(r"D:\gq/ivr/template.txt", 'r', 'utf-8')
             ivr_result_str = "未导入"
             try:
@@ -523,3 +542,5 @@ if __name__ == "__main__":
         ivr_resource.close()
         router_log_source.close()
         push_log_source.close()
+        yongyou_data_source.write(yongyou_data_str)
+        yongyou_data_source.close()

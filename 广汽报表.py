@@ -4,7 +4,7 @@ import datetime
 import os
 import requests
 
-cookies={'SESSION':'df82c897-0996-47d8-9819-f244da816f37'}
+cookies={'SESSION':'4e8f09a6-b77c-4df7-9931-faf4143d7c08'}
 headers = {'Content-Type': 'application/json'}
 oneday=datetime.timedelta(days=1)
 yesterday_str = (datetime.date.today()-oneday).strftime('%Y-%m-%d')
@@ -20,7 +20,7 @@ params = {
 get_url_r = requests.post(url,headers=headers,data=json.dumps(params),cookies=cookies)
 if not os.path.exists("D:\gq/report"):  # 判断日志地址是否存在，若不存在则创建
     os.makedirs("D:\gq/report")
-data_source = codecs.open("gq/report/"+yesterday_str+".csv", 'w+', 'utf-8')
+data_source = codecs.open("D:\gq/report/"+yesterday_str+".csv", 'w+', 'utf-8-sig')
 tmp = "部门名称,编号,所属机构,企业ID,外呼总数,外呼客户接听数,外呼双方接听率,来电总数,来电座席接听数,来电双方接听率,登录座席数,活跃座席数\n"
 # tmp = "部门名称,企业ID,外呼总数,外呼客户接听数,登录座席数,活跃座席数\n"
 for line in get_url_r.json()["result"]:
