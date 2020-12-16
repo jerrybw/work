@@ -308,7 +308,7 @@ def import_push(url_host, enterprise_id, token):
 
 
 if __name__ == "__main__":
-    data_resource = codecs.open(r"D:\gq/1.csv", 'r', 'utf-8')
+    data_resource = codecs.open(r"D:\gq/1.csv", 'r', 'utf-8-sig')
     today_str = datetime.datetime.now().strftime('%Y-%m-%d')
     log_path = "D:\gq/log/" + today_str + "/"  # 定义日志存放地址，默认为当前文件同目录下log文件夹下
     tmp_path = "D:\gq/tmp/" + today_str + "/"  # 定义临时字典存放地址，默认为当前文件同目录下tmp文件夹下
@@ -491,6 +491,7 @@ if __name__ == "__main__":
         skill_log_source.close()
         data_resource.close()
     yongyou_data_str = ""
+    ivr_resource = codecs.open(r"D:\gq/ivr/template.txt", 'r', 'utf-8')
     try:
         for enterprise_key in transfer_dict:
             yongyou_data_str = yongyou_data_str + str(mendian_dict[transfer_dict[enterprise_key]["code"]]) + ",坐席号,CTI员工号,密码（明文：gqcq@2020）,绑定分机号,是否有效,传祺登录账号,员工姓名,岗位,经销商代码,经销商名称\n"

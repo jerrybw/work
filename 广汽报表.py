@@ -4,7 +4,7 @@ import datetime
 import os
 import requests
 
-cookies={'SESSION':'4e8f09a6-b77c-4df7-9931-faf4143d7c08'}
+cookies={'SESSION':'418edfd2-bae0-4b8c-b8ba-d163ec64cdb2'}
 headers = {'Content-Type': 'application/json'}
 oneday=datetime.timedelta(days=1)
 yesterday_str = (datetime.date.today()-oneday).strftime('%Y-%m-%d')
