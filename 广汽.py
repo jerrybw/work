@@ -314,8 +314,8 @@ if __name__ == "__main__":
     tmp_path = "D:\gq/tmp/" + today_str + "/"  # 定义临时字典存放地址，默认为当前文件同目录下tmp文件夹下
     ivr_path = "D:\gq/ivr/" + today_str + "/"  # 定义临时ivr存放地址，默认为当前文件同目录下ivr文件夹下
     yongyou_path = "D:\gq/yongyou/" + today_str + "/"  # 定义临时ivr存放地址，默认为当前文件同目录下ivr文件夹下
-    # url_host = "https://interface-gqcq.gacmotor.com/"
-    url_host = "https://api-test-2.cticloud.cn/"
+    url_host = "https://interface-gqcq.gacmotor.com/"
+    # url_host = "https://api-test-2.cticloud.cn/"
     if not os.path.exists(log_path):  # 判断日志地址是否存在，若不存在则创建
         os.makedirs(log_path)
     if not os.path.exists(tmp_path):  # 判断缓存地址是否存在，若不存在则创建
@@ -331,12 +331,12 @@ if __name__ == "__main__":
     queue_dict = {}
     transfer_dict = {}
     gateway_dict = {}
+    mendian_dict = json.load(open("D:\gq/mendian.json", encoding='utf-8'))
     try:
         skill_dict = json.load(open(tmp_path + "skill.json", encoding='utf-8'))
         queue_dict = json.load(open(tmp_path + "queue.json", encoding='utf-8'))
         transfer_dict = json.load(open(tmp_path + "transfer.json", encoding='utf-8'))
         gateway_dict = json.load(open(tmp_path + "gateway.json", encoding='utf-8'))
-        mendian_dict = json.load(open("D:\gq/mendian.json", encoding='utf-8'))
     except Exception:
         print(Exception.__context__)
     result_log_source = codecs.open(log_path + "result.log", 'a+', 'utf-8')
@@ -373,6 +373,7 @@ if __name__ == "__main__":
                 int(num)
             except Exception:
                 continue
+            print(num)
             result_log_source.write(str(num))
             try:
                 skills_map = skill_dict[enterprise_id]
@@ -392,6 +393,7 @@ if __name__ == "__main__":
                 gateway_dict[enterprise_id] = {}
             skill_id = 0
             transfer_dict[enterprise_id]["code"] = unique_num
+            transfer_dict[enterprise_id]["token"] = token
             try:
                 transfer_map = transfer_dict[enterprise_id]["persons"]
             except Exception:
@@ -439,7 +441,6 @@ if __name__ == "__main__":
                 result_log_source.write(";创建座席成功")
             else:
                 result_log_source.write(";创建座席失败")
-            transfer_dict[enterprise_id]["token"] = token
             try:
                 transfer_map = transfer_dict[enterprise_id]["list"]
             except Exception:
@@ -537,6 +538,7 @@ if __name__ == "__main__":
             except Exception:
                 push_log_source.write(str(enterprise_key) + ";导入推送失败\n")
     except Exception:
+        print("发生异常"+str(enterprise_key))
         pass
     finally:
         ivr_log_source.close()
